@@ -23,6 +23,8 @@ env:
 
   DEPLOYMENT_BRANCH: gh-pages # the name of the branch, will be automatically created if it does not exist
 
+  GODOT_VERSION: 4.2.1
+
 jobs:
   # export_web:
   #   runs-on: ubuntu-latest

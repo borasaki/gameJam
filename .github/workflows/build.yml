@@ -14,7 +14,7 @@ env:
   GODOT_MAJOR_MINOR_VERSION: "4.2.1" # must be a string, not a number
   GODOT_PATCH_VERSION: stable2.1
 
-  PROJECT_FOLDER: "/project" # the path to the godot project (must contain `project.godot` file) relative to the github root path
+  PROJECT_FOLDER: "./project" # the path to the godot project (must contain `project.godot` file) relative to the github root path
 
   EXPORT_TEMPLATE: release # export with release || debug
   EXPORT_PRESET_NAME: web # name of the preset

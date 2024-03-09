@@ -24,62 +24,100 @@ env:
   DEPLOYMENT_BRANCH: gh-pages # the name of the branch, will be automatically created if it does not exist
 
 jobs:
-  export_web:
-    runs-on: ubuntu-latest
-    name: Export Web Game
-    steps:
-    - name: "Set environmental variables"
-      # If you have a custom godot you may want to modify the urls to download your own godot and templates
-      run: |
-        echo "GODOT_VERSION=${GODOT_MAJOR_MINOR_VERSION}.${GODOT_PATCH_VERSION}" >> $GITHUB_ENV
+  # export_web:
+  #   runs-on: ubuntu-latest
+  #   name: Export Web Game
+  #   steps:
+  #   - name: "Set environmental variables"
+  #     # If you have a custom godot you may want to modify the urls to download your own godot and templates
+  #     run: |
+  #       echo "GODOT_VERSION=${GODOT_MAJOR_MINOR_VERSION}.${GODOT_PATCH_VERSION}" >> $GITHUB_ENV
 
-        echo "GODOT_EXECUTABLE_DOWNLOAD_URL=https://downloads.tuxfamily.org/godotengine/4.2.1/Godot_v4.2.1-stable_linux.x86_64.zip" >> $GITHUB_ENV
-        echo "GODOT_TEMPLATES_DOWNLOAD_URL=https://downloads.tuxfamily.org/godotengine/4.2.1/Godot_v4.2.1-stable_export_templates.tpz" >> $GITHUB_ENV
+  #       echo "GODOT_EXECUTABLE_DOWNLOAD_URL=https://downloads.tuxfamily.org/godotengine/4.2.1/Godot_v4.2.1-stable_linux.x86_64.zip" >> $GITHUB_ENV
+  #       echo "GODOT_TEMPLATES_DOWNLOAD_URL=https://downloads.tuxfamily.org/godotengine/4.2.1/Godot_v4.2.1-stable_export_templates.tpz" >> $GITHUB_ENV
 
-    - name: Checkout
-      uses: actions/checkout@v4
+  #   - name: Checkout
+  #     uses: actions/checkout@v4
     
-    - name: Install Godot
-      run: |
-        # Download godot executable and templates
-        curl ${GODOT_EXECUTABLE_DOWNLOAD_URL} --output godot.zip
-        curl ${GODOT_TEMPLATES_DOWNLOAD_URL} --output templates.tpz
+  #   - name: Install Godot
+  #     run: |
+  #       # Download godot executable and templates
+  #       curl ${GODOT_EXECUTABLE_DOWNLOAD_URL} --output godot.zip
+  #       curl ${GODOT_TEMPLATES_DOWNLOAD_URL} --output templates.tpz
 
-        unzip godot.zip -d godot
-        unzip templates.tpz
+  #       unzip godot.zip -d godot
+  #       unzip templates.tpz
 
-        # Create needed dirs
-        # Templates with godot 4 must be in ~/.local/share/godot/export_templates/${MAJOR.MINOR.PATCH}
-        mkdir -v -p ~/.local/share/godot/export_templates/${GODOT_VERSION}
+  #       # Create needed dirs
+  #       # Templates with godot 4 must be in ~/.local/share/godot/export_templates/${MAJOR.MINOR.PATCH}
+  #       mkdir -v -p ~/.local/share/godot/export_templates/${GODOT_VERSION}
         
-        mv templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}
-        mv godot/Godot* ${GITHUB_WORKSPACE}/godot.x86_64
+  #       mv templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}
+  #       mv godot/Godot* ${GITHUB_WORKSPACE}/godot.x86_64
 
-        # Just cleaning
-        rm -R templates/
-        rm templates.tpz
+  #       # Just cleaning
+  #       rm -R templates/
+  #       rm templates.tpz
     
-    - name: Build Project
-      run: |
-        mkdir -v -p ${GITHUB_WORKSPACE}/${EXPORT_FOLDER}
-        cd ${PROJECT_FOLDER}
+  #   - name: Build Project
+  #     run: |
+  #       mkdir -v -p ${GITHUB_WORKSPACE}/${EXPORT_FOLDER}
+  #       cd ${PROJECT_FOLDER}
 
-        # Exporting the game
-        ${GITHUB_WORKSPACE}/godot.x86_64 --headless --path . --export-${EXPORT_TEMPLATE} ${EXPORT_PRESET_NAME} ${GITHUB_WORKSPACE}/${EXPORT_FOLDER}/${EXPORT_FILENAME}
+  #       # Exporting the game
+  #       ${GITHUB_WORKSPACE}/godot.x86_64 --headless --path . --export-${EXPORT_TEMPLATE} ${EXPORT_PRESET_NAME} ${GITHUB_WORKSPACE}/${EXPORT_FOLDER}/${EXPORT_FILENAME}
     
-    - name: Add coi-service-worker
-      run: |
-        git clone https://github.com/gzuidhof/coi-serviceworker.git
-        mv coi-serviceworker/coi-serviceworker.js ${EXPORT_FOLDER}/coi-serviceworker.js
+  #   - name: Add coi-service-worker
+  #     run: |
+  #       git clone https://github.com/gzuidhof/coi-serviceworker.git
+  #       mv coi-serviceworker/coi-serviceworker.js ${EXPORT_FOLDER}/coi-serviceworker.js
     
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v1
-      with:
-        name: ${{ env.EXPORT_PRESET_NAME }}
-        path: ${{ env.EXPORT_FOLDER }}
+  #   - name: Upload Artifact
+  #     uses: actions/upload-artifact@v1
+  #     with:
+  #       name: ${{ env.EXPORT_PRESET_NAME }}
+  #       path: ${{ env.EXPORT_FOLDER }}
     
-    - name: Deploy to GitHub Pages 🚀
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        branch: ${{ env.DEPLOYMENT_BRANCH }}
-        folder: ${{ env.EXPORT_FOLDER }}
+  #   - name: Deploy to GitHub Pages 🚀
+  #     uses: JamesIves/github-pages-deploy-action@v4
+  #     with:
+  #       branch: ${{ env.DEPLOYMENT_BRANCH }}
+  #       folder: ${{ env.EXPORT_FOLDER }}
+
+  export-web:
+    if: true
+    name: Web Export
+    runs-on: ubuntu-20.04
+    container:
+      image: barichello/godot-ci:4.2.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup
+        run: |
+          mkdir -v -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+          mv -v /root/.local/share/godot/templates/* ~/.local/share/godot/export_templates/
+      - name: Web Build
+        run: |
+          mkdir -v -p builds/web
+          godot -v --headless --export-release "Web" ./builds/web/index.html
+      - name: Add COI Service Worker
+        run: |
+          wget https://github.com/gzuidhof/coi-serviceworker/raw/master/coi-serviceworker.min.js -O ./builds/web/coi-serviceworker.min.js
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: web
+          path: builds/web
+          retention-days: 1
+      # Installing rsync is needed in order to deploy to GitHub Pages. Without it, the build will fail.
+      - name: Install rsync 📚
+        run: |
+          apt-get update && apt-get install -y rsync
+      - name: Deploy to GitHub Pages 🚀
+        uses: JamesIves/github-pages-deploy-action@releases/v4
+        with:
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: builds/web # The folder the action should deploy.
+      - name: Zip Folder
+        run: zip -r itch.zip builds/web

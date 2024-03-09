@@ -25,6 +25,10 @@ env:
 
   GODOT_VERSION: 4.2.1
 
+  GODOT_VERSION: 4.2.1
+  EXPORT_NAME: build/web
+  PROJECT_PATH: project
+
 jobs:
   # export_web:
   #   runs-on: ubuntu-latest

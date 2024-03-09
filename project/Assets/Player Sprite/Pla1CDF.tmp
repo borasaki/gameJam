@@ -1,0 +1,79 @@
+[gd_scene load_steps=12 format=3 uid="uid://bobuj26wp35sn"]
+
+[ext_resource type="Texture2D" uid="uid://b03v1mcaaxn2u" path="res://Assets/Player Sprite/y2j24kxf.bmp" id="1_p0r03"]
+[ext_resource type="Script" path="res://Scripts/Player/Player.gd" id="1_yt5am"]
+[ext_resource type="Script" path="res://Scripts/State Machine/StateMachine.gd" id="3_dcx7x"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jtqt3"]
+height = 32.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dt4mk"]
+atlas = ExtResource("1_p0r03")
+region = Rect2(0, 0, 44, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tbeu1"]
+atlas = ExtResource("1_p0r03")
+region = Rect2(0, 0, 44, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_10e5i"]
+atlas = ExtResource("1_p0r03")
+region = Rect2(0, 0, 44, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nb4hj"]
+atlas = ExtResource("1_p0r03")
+region = Rect2(0, 0, 44, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8dvwh"]
+atlas = ExtResource("1_p0r03")
+region = Rect2(0, 0, 44, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s3fas"]
+atlas = ExtResource("1_p0r03")
+region = Rect2(44, 0, 44, 44)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_yn8xw"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dt4mk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tbeu1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_10e5i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nb4hj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8dvwh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s3fas")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_yt5am")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -2)
+shape = SubResource("CapsuleShape2D_jtqt3")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 3
+position = Vector2(0, -8)
+sprite_frames = SubResource("SpriteFrames_yn8xw")
+animation = &"idle"
+frame_progress = 0.481236
+
+[node name="MoveSM" type="Node" parent="."]
+script = ExtResource("3_dcx7x")
+
+[node name="Idle" type="Node" parent="MoveSM"]
+
+[node name="Walk" type="Node" parent="MoveSM"]

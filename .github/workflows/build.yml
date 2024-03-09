@@ -107,7 +107,7 @@ jobs:
         run: |
           wget https://github.com/gzuidhof/coi-serviceworker/raw/master/coi-serviceworker.min.js -O ./builds/web/coi-serviceworker.min.js
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web
           path: builds/web
@@ -121,5 +121,3 @@ jobs:
         with:
           BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: builds/web # The folder the action should deploy.
-      - name: Zip Folder
-        run: zip -r itch.zip builds/web
